@@ -42,9 +42,9 @@ setuptools==82.0.1
 six==1.17.0
 starlette==0.52.1
 sympy==1.14.0
-torch==2.10.0
-torch-geometric==2.7.0
-torchvision==0.25.0
+torch --index-url https://download.pytorch.org/whl/cpu
+torchvision --index-url https://download.pytorch.org/whl/cpu
+torch-geometric
 tqdm==4.67.3
 typing-inspection==0.4.2
 typing_extensions==4.15.0
