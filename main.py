@@ -55,8 +55,8 @@ DATA_MEAN = torch.tensor(_stats["mean"].flatten(), dtype=torch.float32)
 DATA_STD = torch.tensor(_stats["std"].flatten(), dtype=torch.float32)
 
 # --- Model Classes & Tools ---
-from train_healer import HealerGAT
-from simulator import Generator, interpolate_idw
+from models import HealerGAT, Generator, interpolate_idw
+import gc
 
 # Load persistence dependencies needed for inference
 EDGE_INDEX = torch.load(os.path.join(BASE_DIR, "edge_index.pt"), map_location=torch.device('cpu'), weights_only=True)
@@ -220,11 +220,15 @@ def simulate(request: PolicyRequest):
     # Increase blur radius to strongly smooth out the 64x64 cGAN grid
     img = img.filter(ImageFilter.GaussianBlur(radius=2.5)) 
     # Upscale significantly to prevent any pixelation in the frontend
-    img = img.resize((1024, 1024), resample=Image.LANCZOS)
+    img = img.resize((512, 512), resample=Image.LANCZOS)
     
     buf = io.BytesIO()
     img.save(buf, format="PNG")
     b64_str = base64.b64encode(buf.getvalue()).decode("utf-8")
+    
+    # Explicit memory cleanup for Render stability
+    del img, output, rgba_img
+    gc.collect()
     
     return {"status": "success", "image_b64": b64_str}
 
